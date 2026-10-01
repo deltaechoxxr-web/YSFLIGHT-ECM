@@ -1,0 +1,30 @@
+--- a/src/externalconsole/fsinstreading.h
++++ b/src/externalconsole/fsinstreading.h
+@@ -163,6 +163,13 @@ class FsInstrumentIndication
+ 	enum
+ 	{
+ 		MAX_NUM_ENGINE=16,
+ 		MAX_NUM_FUELTANK=16
+ 	};
++
++	enum ECMSTATE
++	{
++		FSECM_OFF=0,
++		FSECM_ACTIVE=1,
++		FSECM_LOW=2,
++		FSECM_CRITICAL=3
++	};
+ 
+ 	double heading,headingBug;
+ 	YSBOOL headingBugSelected;
+@@ -200,6 +207,10 @@ public:
+ 
+ 	double elevator,elevatorTrim,aileron,rudder;
+ 
++	// ECM / Jamming
++	int ecmState;
++	double ecmPower;
++
+ 	YsVec3 velocity;  // Relative to the aircraft coordinate
+ 
+ 	void CleanUp(void);

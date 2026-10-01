@@ -1,0 +1,33 @@
+--- a/src/vehicle/fsairplaneproperty.h
++++ b/src/vehicle/fsairplaneproperty.h
+@@ -469,6 +469,16 @@ protected:
+ 	// Radar
+ 	YSBOOL chHasBombingRadar;
+ 	YSBOOL chHasGroundRadar;
+ 	YSBOOL chHasAirRadar;
++
++	// ECM / Jamming System
++	YSBOOL chHasEcm;
++	double chEcmMaxEnergy;
++	double chEcmDrainRate;
++	double chEcmRechargeRate;
++	double chEcmPower;
++
++	YSBOOL staEcmActive;
++	double staEcmEnergy;
+ 
+ 	//Reference Vars
+ 	double refSpdCruise;     //Cruising Speed
+@@ -583,6 +593,12 @@ public:
+ 	YSRESULT ToggleStrobe(void);
+ 	YSRESULT ToggleLandingLight(void);
+ 
++	// ECM / Jamming System
++	YSRESULT ToggleEcm(void);
++	YSBOOL IsEcmActive(void) const;
++	double GetEcmPower(void) const;
++	void UpdateEcm(const double &dt);
++
+ 
+ 	int LoadWeaponToSlot(FSWEAPONTYPE wpnType,int n); // Returns number of weapons actually loaded
+ 	int AddWeaponToSlot(FSWEAPONTYPE wpnType,int n);  // Returns number of weapons actually loaded

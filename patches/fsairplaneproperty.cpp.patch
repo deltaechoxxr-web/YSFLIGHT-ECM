@@ -1,0 +1,80 @@
+--- a/src/vehicle/fsairplaneproperty.cpp
++++ b/src/vehicle/fsairplaneproperty.cpp
+@@ -385,6 +385,16 @@ void FsAirplaneProperty::Initialize(void)
+ 	chHasBombingRadar=YSFALSE;
+ 	chHasGroundRadar=YSFALSE;
+ 	chHasAirRadar=YSFALSE;
++
++	// ECM / Jamming System
++	chHasEcm=YSTRUE;
++	chEcmMaxEnergy=120.0;
++	chEcmDrainRate=8.0;
++	chEcmRechargeRate=12.0;
++	chEcmPower=0.9;
++
++	staEcmActive=YSFALSE;
++	staEcmEnergy=chEcmMaxEnergy;
+ 
+ 	refSpdCruise=0.0;
+ 	refAltCruise=0.0;
+@@ -1042,3 +1052,57 @@ const double FsAirplaneProperty::GetMalfunctioningAirspeedIndication(void) cons
+ }
+ }
+ 
++YSRESULT FsAirplaneProperty::ToggleEcm(void)
++{
++	if(chHasEcm==YSFALSE)
++	{
++		return YSERR;
++	}
++
++	staEcmActive = !staEcmActive;
++	if(staEcmActive && staEcmEnergy <= 0.0)
++	{
++		staEcmActive = YSFALSE;
++		return YSERR;
++	}
++	return YSOK;
++}
++
++YSBOOL FsAirplaneProperty::IsEcmActive(void) const
++{
++	return chHasEcm==YSTRUE && staEcmActive==YSTRUE && staEcmEnergy>0.0;
++}
++
++double FsAirplaneProperty::GetEcmPower(void) const
++{
++	if(IsEcmActive()==YSFALSE)
++	{
++		return 0.0;
++	}
++	return chEcmPower * (staEcmEnergy / chEcmMaxEnergy);
++}
++
++void FsAirplaneProperty::UpdateEcm(const double &dt)
++{
++	if(chHasEcm==YSFALSE)
++	{
++		staEcmActive=YSFALSE;
++		staEcmEnergy=0.0;
++		return;
++	}
++
++	if(staEcmActive)
++	{
++		staEcmEnergy -= chEcmDrainRate * dt;
++		if(staEcmEnergy <= 0.0)
++		{
++			staEcmEnergy = 0.0;
++			staEcmActive = YSFALSE;
++		}
++	}
++	else
++	{
++		staEcmEnergy += chEcmRechargeRate * dt;
++		if(staEcmEnergy > chEcmMaxEnergy)
++		{
++			staEcmEnergy = chEcmMaxEnergy;
++		}
++	}
++}

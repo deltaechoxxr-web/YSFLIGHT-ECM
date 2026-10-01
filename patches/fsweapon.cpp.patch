@@ -1,0 +1,51 @@
+--- a/src/core/fsweapon.cpp
++++ b/src/core/fsweapon.cpp
+@@ -1063,7 +1063,45 @@ void FsWeapon::Move(const double &dt,const double &cTime,const FsWeather &weat
+ 
+ YSBOOL FsWeapon::IsOwnerStillHaveTarget(void)
+ {
+-	YSHASHKEY ownerAirTargetKey=YSNULLHASHKEY;
++	if(NULL==target)
++	{
++		return YSFALSE;
++	}
++
++	if(YSTRUE!=target->IsAlive())
++	{
++		target=NULL;
++		return YSFALSE;
++	}
++
++	// ECM lock-breaking logic
++	FsAirplane *targetAir = NULL;
++	if(FSEX_AIRPLANE==target->GetType())
++	{
++		targetAir = (FsAirplane *)target;
++	}
++
++	if(NULL != targetAir && YSTRUE == targetAir->Prop().IsEcmActive())
++	{
++		double ecmPower = targetAir->Prop().GetEcmPower();
++		double lockFactor = 1.0 - 0.85 * ecmPower;
++
++		if(lockFactor < 0.15)
++		{
++			target = NULL;
++			return YSFALSE;
++		}
++
++		if(lockFactor < 0.35)
++		{
++			double breakLockProbability = 0.8 * (1.0 - lockFactor);
++			if(YsRandom() < breakLockProbability)
++			{
++				target = NULL;
++				return YSFALSE;
++			}
++		}
++	}
++
++	YSHASHKEY ownerAirTargetKey=YSNULLHASHKEY;
+ 	if(NULL!=firedBy)
+ 	{
+ 		if(FSEX_AIRPLANE==firedBy->GetType())
