@@ -1,6 +1,6 @@
 # YSFLIGHT-ECM
 
-Prototype of an ECM / jamming subsystem for a flight simulator.
+Prototype of ECM / jamming and laser weapon systems for a flight simulator.
 
 This version is intentionally isolated from the original YSFLIGHT codebase and focuses on the logic behind:
 
@@ -9,6 +9,7 @@ This version is intentionally isolated from the original YSFLIGHT codebase and f
 - radar range degradation under jamming
 - lock quality degradation and lock break behavior
 - HUD-style state reporting
+- a laser weapon with range, energy use, recharge, and cooldown
 
 ## Build
 
@@ -29,6 +30,14 @@ The prototype uses these rules:
 - While active, the target's radar detection range drops.
 - Missile lock quality also decreases and may break if the jammer is strong enough.
 - If the ECM is switched off, the unit recharges.
+
+## Laser Weapon
+
+The laser is modeled as a short-range, instant-hit weapon. A successful shot
+requires the target to be within range, enough energy, and no active cooldown.
+Shots consume energy and report their damage; energy recharges over time when
+`update(dt)` is called. The prototype reports a hit but does not yet apply
+damage to an aircraft model.
 
 ## ECM States
 
