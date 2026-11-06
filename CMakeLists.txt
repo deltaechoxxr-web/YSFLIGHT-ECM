@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(ysflight_ecm_demo
     src/main.cpp
     src/ecm.cpp
+    src/laser.cpp
 )
 
 target_include_directories(ysflight_ecm_demo

@@ -1,4 +1,5 @@
 #include "ecm.h"
+#include "laser.h"
 
 #include <iomanip>
 #include <iostream>
@@ -6,8 +7,8 @@
 int main() {
     using namespace ysflight;
 
-    std::cout << "YSFLIGHT ECM prototype v2\n";
-    std::cout << "------------------------\n\n";
+    std::cout << "YSFLIGHT ECM and laser prototype\n";
+    std::cout << "--------------------------------\n\n";
 
     EcmConfig cfg;
     cfg.maxEnergy = 120.0;
@@ -66,6 +67,28 @@ int main() {
     std::cout << "  effective radar range: " << radar.effectiveRange() << " m\n";
     std::cout << "  lock quality: " << radar.lockQuality() << "\n";
     std::cout << "  can maintain lock: " << (radar.canMaintainLock() ? "yes" : "no") << "\n";
+
+    LaserConfig laserConfig;
+    laserConfig.maxEnergy = 100.0;
+    laserConfig.energyPerShot = 30.0;
+    laserConfig.rechargeRate = 10.0;
+    laserConfig.cooldownSeconds = 2.0;
+    laserConfig.maxRange = 3000.0;
+    laserConfig.damagePerShot = 25.0;
+
+    LaserWeapon laser(laserConfig);
+    const LaserShotResult firstShot = laser.fire(1500.0);
+    std::cout << "\nLASER: target at 1500 m\n";
+    std::cout << "  result: " << toString(firstShot.status) << "\n";
+    std::cout << "  damage: " << firstShot.damage << "\n";
+    std::cout << "  energy: " << laser.energy() << "/" << laser.maxEnergy() << "\n";
+
+    const LaserShotResult rapidShot = laser.fire(1500.0);
+    std::cout << "  immediate second shot: " << toString(rapidShot.status) << "\n";
+
+    laser.update(laser.cooldownRemaining());
+    const LaserShotResult distantShot = laser.fire(3500.0);
+    std::cout << "  target at 3500 m: " << toString(distantShot.status) << "\n";
 
     return 0;
 }
